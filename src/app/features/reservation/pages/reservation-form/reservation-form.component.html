@@ -1,0 +1,213 @@
+<form [formGroup]="reservationForm" novalidate (ngSubmit)="onSubmit()">
+    <mat-accordion class="reservation-accordion">
+        <mat-expansion-panel [expanded]="step() === 0" (opened)="setStep(0)" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title> Personal data </mat-panel-title>
+                <mat-panel-description>
+                    Type your name and contact data
+                    <mat-icon>account_circle</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput placeholder="John Doe" formControlName="name" />
+                @if (reservationForm.controls['name'].hasError('required')) {
+                    <mat-error>Name is <strong>required</strong></mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Email</mat-label>
+                <input matInput placeholder="johndoe@proton.me" formControlName="email" type="email">
+                @if (reservationForm.controls['email'].hasError('email') &&
+                !reservationForm.controls['email'].hasError('required')) {
+                <mat-error>Please enter a valid email address</mat-error>
+                }
+                @if (reservationForm.controls['email'].hasError('required')) {
+                <mat-error>Email is <strong>required</strong></mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Phone number</mat-label>
+                <input matInput placeholder="612345678" formControlName="phone">
+                @if (reservationForm.controls['phone'].hasError('pattern') &&
+                !reservationForm.controls['phone'].hasError('required')) {
+                <mat-error>Please enter a valid phone number</mat-error>
+                }
+                @if (reservationForm.controls['phone'].hasError('required')) {
+                <mat-error>Phone is <strong>required</strong></mat-error>
+                }
+            </mat-form-field>
+            <mat-action-row>
+                <button mat-button (click)="nextStep()" type="button">Next</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="step() === 1" (opened)="setStep(1)" hideToggle>
+
+            <mat-expansion-panel-header>
+                <mat-panel-title> Day of the reservation </mat-panel-title>
+                <mat-panel-description>
+                    Inform the date and time you want to make the reservation
+                    <mat-icon>date_range</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+                <mat-label>Choose a date</mat-label>
+                <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="date">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker startView="month" [startAt]="startDate"></mat-datepicker>
+                @if (reservationForm.controls['date'].invalid) {
+                    <mat-error>{{dateErrorMessage()}}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Choose a time</mat-label>
+                <mat-select formControlName="time" name="time">
+                    <mat-option>None</mat-option>
+                    @for (hour of availableHours; track hour) {
+                    <mat-option [value]="hour">{{ hour }}</mat-option>
+                    }
+                </mat-select>
+                @if (reservationForm.controls['time'].hasError('required')) {
+                    <mat-error>Time is <strong>required</strong></mat-error>
+                    }
+            </mat-form-field>
+
+            <mat-action-row>
+                <button mat-button (click)="prevStep()" type="button">Previous</button>
+                <button mat-button (click)="nextStep()" type="button">Next</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="step() === 2" (opened)="setStep(2)" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title> Reservation details </mat-panel-title>
+                <mat-panel-description>
+                    Choose the size of the table, region and other reservation details
+                    <mat-icon>groups</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+                <mat-label>Number of people</mat-label>
+                <input matInput formControlName="numberOfPeople" type="text">
+                @if (reservationForm.controls['numberOfPeople'].invalid) {
+                <mat-error>{{numberOfPeopleErrorMessage()}}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Number of children</mat-label>
+                <input matInput formControlName="numberOfChildren" type="text">
+                @if (reservationForm.controls['numberOfChildren'].invalid) {
+                <mat-error>{{numberOfChildrenErrorMessage()}}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-divider></mat-divider>
+
+            <mat-slide-toggle formControlName="smokers">
+                Any party member would like to smoke during dinner?
+                <strong>{{reservationForm.controls['smokers'].value ? 'YES' : 'NO'}}</strong>
+            </mat-slide-toggle>
+
+            <mat-divider></mat-divider>
+
+            <mat-form-field>
+                <mat-label>Region</mat-label>
+                <mat-select formControlName="region" name="region">
+                    <mat-option>None</mat-option>
+                    @for (region of availableRegions; track region) {
+                    <mat-option [value]="region">{{ mapRegionToString[region] }}</mat-option>
+                }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-divider></mat-divider>
+
+            <mat-slide-toggle formControlName="isBirthdayParty">
+                Is a birthday party?
+                <strong>{{reservationForm.controls['isBirthdayParty'].value ? 'YES' : 'NO'}}</strong>
+            </mat-slide-toggle>
+
+            @if (reservationForm.controls['isBirthdayParty'].value) {
+            <div class="birthday-name-input">
+                <mat-form-field>
+                    <mat-label>Birthday person</mat-label>
+                    <input matInput placeholder="Mike" formControlName="nameOfBirthdayPerson">
+                </mat-form-field>
+            </div>
+            }
+            <mat-action-row>
+                <button mat-button (click)="prevStep()" type="button">Previous</button>
+                <button mat-button (click)="goToReview()" type="button">Review</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="step() === 3" (opened)="setStep(3)" hideToggle [disabled]="step() !== 3">
+            <mat-expansion-panel-header>
+                <mat-panel-title> Reservation review </mat-panel-title>
+                <mat-panel-description>
+                    Review your details and check if everything is correct
+                    <mat-icon>preview</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="card-container">
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title> Personal data</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p><strong>Name:</strong> {{ reservationForm.value.name }}</p>
+                        <p><strong>Email:</strong> {{ reservationForm.value.email }}</p>
+                        <p><strong>Phone:</strong> {{ reservationForm.value.phone }}</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button (click)="setStep(0)" type="button">Edit</button>
+                    </mat-card-actions>
+                </mat-card>
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title> Day of the reservation</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p><strong>Date:</strong> {{ reservationForm.value.date | date }}</p>
+                        <p><strong>Time:</strong> {{ reservationForm.value.time }}</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button (click)="setStep(1)" type="button">Edit</button>
+                    </mat-card-actions>
+                </mat-card>
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title> Reservation details</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p><strong>Size of the table:</strong> {{ reservationForm.value.numberOfPeople }}</p>
+                        <p><strong>Number of children:</strong> {{ reservationForm.value.numberOfChildren }}</p>
+                        <p><strong>Region:</strong> {{ mapRegionToString[reservationForm.value.region!] }}</p>
+                        <p><strong>Smokers:</strong> {{ reservationForm.value.smokers ? 'YES' : 'NO' }}</p>
+                        @if (reservationForm.controls['isBirthdayParty'].value) {
+                            <p><strong>Birthday party:</strong> {{ reservationForm.value.nameOfBirthdayPerson || 'YES' }}</p>
+                        }
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button (click)="setStep(2)" type="button">Edit</button>
+                    </mat-card-actions>
+                </mat-card>
+
+            </div>
+
+            <mat-action-row>
+                <button mat-button (click)="prevStep()" type="button">Previous</button>
+                <button mat-button type="submit">End</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+    </mat-accordion>
+</form>

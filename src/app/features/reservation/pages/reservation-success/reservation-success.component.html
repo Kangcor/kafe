@@ -1,0 +1,36 @@
+<h3 class="text-align-center">Your reservation has been confirmed!</h3>
+<div class="card-container">
+    <mat-card appearance="outlined">
+        <mat-card-header>
+            <mat-card-title> Personal data</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p><strong>Name:</strong> {{ reservation.name }}</p>
+            <p><strong>Email:</strong> {{ reservation.email }}</p>
+            <p><strong>Phone:</strong> {{ reservation.phone }}</p>
+        </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined">
+        <mat-card-header>
+            <mat-card-title> Day of the reservation</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p><strong>Date:</strong> {{ reservation.date | date }}</p>
+            <p><strong>Time:</strong> {{ reservation.time }}</p>
+        </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined">
+        <mat-card-header>
+            <mat-card-title> Reservation details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p><strong>Size of the table:</strong> {{ reservation.numberOfPeople }}</p>
+            <p><strong>Number of children:</strong> {{ reservation.numberOfChildren }}</p>
+            <p><strong>Region:</strong> {{ mapRegionToString[reservation.region!] }}</p>
+            <p><strong>Smokers:</strong> {{ reservation.smokers ? 'YES' : 'NO' }}</p>
+            @if (reservation.isBirthdayParty) {
+                <p><strong>Birthday party:</strong> {{ reservation.nameOfBirthdayPerson || 'YES' }}</p>
+            }
+        </mat-card-content>
+    </mat-card>
+</div>

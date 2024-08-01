@@ -1,0 +1,37 @@
+.reservation-accordion .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reservation-accordion .mat-mdc-form-field+.mat-mdc-form-field {
+  margin-left: 8px;
+}
+
+.mat-divider {
+  margin: 1rem 0;
+}
+
+.birthday-name-input {
+  margin-top: 1rem;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+mat-card{
+  display:flex;
+  flex-direction: column;
+}
+
+mat-card-header {
+  flex-shrink: 0;
+}
+
+mat-card-content{
+  flex-grow: 1;
+  overflow: auto;
+  margin-top: 1rem;
+}
